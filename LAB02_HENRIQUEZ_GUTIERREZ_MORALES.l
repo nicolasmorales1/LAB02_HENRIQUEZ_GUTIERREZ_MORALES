@@ -21,8 +21,15 @@ IMAGINARIO	[-+]?[0-9]+[Jj]?
 ENTERO	[-+]?[0-9]+
 DECIMAL	[-+]?[0-9]+"."([0-9]+([eE][-+]?[0-9]+)?)?
 CADE    \"[^,)\n]*|\'[^,)\n]*
+
 OPERADOR		[+*/-]
+COMPARADOR		[= < > <= >= != ==]
+OP_LOGICOS		[and or not]
+
 E_Arit		[LONG IMAGINARIO ENTERO DECIMAL][[OPERADOR][LONG IMAGINARIO ENTERO DECIMAL]]*	
+E_BOOL		[ID LONG IMAGINARIO ENTERO DECIMAL E_Arit][COMPARADOR OP_LOGICOS][ID LONG IMAGINARIO ENTERO DECIMAL E_Arit]
+
+FUNCT		[ID][(]([ID][,ID]*]*)[)]
 
 %%
 
