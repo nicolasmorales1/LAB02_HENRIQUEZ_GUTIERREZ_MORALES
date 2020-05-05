@@ -43,6 +43,8 @@
 %token OP_GEQ
 %token OP_INCREMENT 
 %token OP_DECREMENT
+%token DEF_FUNCTION
+%token RANGE
 
 %token '='
 %token '('
@@ -62,6 +64,9 @@
 %token ','
 %token '#'
 %token ':'
+%token 'in'
+%token 'def'
+%token 'range'
 
 %start PROGRAM
 
@@ -160,17 +165,23 @@ STATEMENT_LIST:
   | /* NULL */
   ;
 
+
+DEF_FUNCTION:
+'def' ID  OPTIONAL_ARGS_EXPRESSION 
+STATEMENT
+RETURN OPTIONAL_ARGS_EXPRESSION
+;
+
+RANGE:
+'range'OPTIONAL_ARGS_EXPRESSION
+;
+
+
+
 FOR_STATEMENT:
   FOR 
-  '(' ID '=' INT_CTES  
-  ASSIGN_LOGIC_EXPRESSION  
-  ASSIGN_MATH_EXPRESSION ')' 
-  STATEMENT
-  | FOR 
-    '(' PRIMITIVE ID '=' INT_CTES  
-    ASSIGN_LOGIC_EXPRESSION  
-    ASSIGN_MATH_EXPRESSION ')' 
-    STATEMENT
+   'for 'ID 'in' RANGE  
+   STATEMENT
   ;       
 
 DO_STATEMENT: 
