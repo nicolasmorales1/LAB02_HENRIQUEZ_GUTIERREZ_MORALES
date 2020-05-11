@@ -17,6 +17,8 @@
 %token SCAN
 %token ARGS
 %token RETURN
+%token PASS
+
 
 %token IF
 %token ELSE
@@ -67,7 +69,7 @@
 %token 'in'
 %token 'def'
 %token 'range'
-
+%token 'pass'
 %start PROGRAM
 
 %%
@@ -83,6 +85,10 @@ BOOKSTORE:
     BOOKSHELVE BOOKSTORE
   | /* NULL */
   ;
+
+PASS:
+  "pass"
+;
 
 BOOKSHELVE:
     LIBRARY
