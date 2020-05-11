@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include<stdbool.h>
+#include "y.tab.h"
 
 int idC = 1;
 char ids[];
@@ -12,6 +13,9 @@ char ErrorCont[];
 char idd[];
 char vecID[1000][1000];
 bool newID = true;
+int yaccErrorsC = 1;
+char yaccErrors[100000];
+int lines = 1;
 
 %}
 	
@@ -182,9 +186,45 @@ FUNCT		[ID][(]([ID][,ID]*]*)[)]
 %%
 
 int yywrap(){}
-int main(int argc, char *argv[]) 
-{
-	printf("se recibio correctamente el archivo de entrada, el argv[1] es: %s\n", argv[1]);
+
+
+void printError() {
+  fprintf(stdout, "Error in line %d Syntax Error\n", (yylineno-1));
+}
+
+void saveError(int lex, char *s) {
+	char *token;
+	char temp[1000];
+	char error_word[1000];
+	if (lex) {
+		snprintf(error_word, 20, "%d Lex", lines);
+	} else {
+		snprintf(error_word, 20, "%d Syntax", lines);
+	}
+	strcpy(temp,yaccErrors);
+	int save = 1;
+	token = strtok(temp, ";");
+	while(token != NULL && save) 
+	{
+		if (strcmp(token,error_word) == 0)
+		{
+			save = 0;
+		}
+		token = strtok(NULL, ";");
+	}
+	if (save)
+	{
+		if (yaccErrorsC > 1)
+		{
+			strcat(yaccErrors,";");
+		}
+		sprintf(yaccErrors, "%s%s", yaccErrors, error_word);
+		yaccErrorsC = yaccErrorsC + 1;
+	}
+}
+
+void printTables(char *argv[]) {
+  printf("se recibio correctamente el archivo de entrada, el argv[1] es: %s\n", argv[1]);
 	FILE *fp = fopen(argv[1], "r");
 	FILE *out_file = fopen("salida.txt", "w"); // write only
     yyin = fp;
@@ -201,19 +241,36 @@ int main(int argc, char *argv[])
 
     }
 
-    
-    
-  
-
-    
+      
     fprintf(out_file, "\n");
 
     fprintf(out_file,"\n\nERRORES LEXICOS\n");
     fprintf(out_file, "Hay %d errores lexicos\n", Errores-1);
     fprintf(out_file, "\n");
 
-    fclose(out_file);
-    fclose(fp);
-    return(0);
+    	fprintf(yyout, "\n");
+	fprintf(yyout,"\nHay %d lineas de codigo\n", lines);
+
+	fprintf(yyout, "Hay %d errores\n", yaccErrorsC-1);
+	if (yaccErrorsC>1)
+	{
+	  int i=0;
+	  fprintf(yyout, "Error in line ");
+	  while (i < strlen(yaccErrors)) 
+	  {    
+	    fprintf(yyout, "%c", yaccErrors[i]);
+	    if (yaccErrors[i] == ';')
+	    {
+	      fprintf(yyout, "\nError in line ");
+	    }
+	    i = i + 1;
+	  }
+	  fprintf(yyout,";\n");
+	}
 }
+
+
+
+
+
 

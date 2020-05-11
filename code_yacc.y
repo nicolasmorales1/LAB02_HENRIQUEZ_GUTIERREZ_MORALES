@@ -17,8 +17,6 @@
 %token SCAN
 %token ARGS
 %token RETURN
-%token PASS
-
 
 %token IF
 %token ELSE
@@ -63,13 +61,14 @@
 %token '<'
 %token '{'
 %token '}'
+%token ';'
 %token ','
 %token '#'
 %token ':'
 %token 'in'
 %token 'def'
 %token 'range'
-%token 'pass'
+
 %start PROGRAM
 
 %%
@@ -86,10 +85,6 @@ BOOKSTORE:
   | /* NULL */
   ;
 
-PASS:
-  "pass"
-;
-
 BOOKSHELVE:
     LIBRARY
   | '#' INCLUDE '<' ID LIBRARY_EXTENSION '>'
@@ -97,12 +92,12 @@ BOOKSHELVE:
   ;
 
 DECLARATION:
-    PRIMITIVE ID '=' CTES 
-  | PRIMITIVE ID '=' CTES DECLARATION_LIST 
-  | PRIMITIVE ASSIGN_EXPRESSIONS 
-  | PRIMITIVE ASSIGN_EXPRESSIONS ASSIGN_EXPRESSIONS_LIST 
-  | PRIMITIVE ID DECLARATION_LIST 
-  | PRIMITIVE ID  
+    PRIMITIVE ID '=' CTES
+  | PRIMITIVE ID '=' CTES DECLARATION_LIST
+  | PRIMITIVE ASSIGN_EXPRESSIONS
+  | PRIMITIVE ASSIGN_EXPRESSIONS ASSIGN_EXPRESSIONS_LIST
+  | PRIMITIVE ID DECLARATION_LIST
+  | PRIMITIVE ID
   ;
 
 OPTIONAL_DECLARATION:
@@ -131,10 +126,9 @@ ASSIGN_EXPRESSIONS_LIST:
   | ',' ASSIGN_EXPRESSIONS ',' ASSIGN_EXPRESSIONS_LIST 
   ;
 
-
 BEGIN_FUNCTION: 
-    VOID_PRIMITIVE MAIN '(' OPTIONAL_ARGS ')' '{' STATEMENT_LIST '}'
-  | error '{' STATEMENT_LIST '}'
+    VOID_PRIMITIVE ID '(' OPTIONAL_ARGS ')' ':' STATEMENT_LIST
+  | error STATEMENT_LIST
   // | error //{ saveError(0); }
   ; 
 
@@ -144,21 +138,24 @@ OPTIONAL_ARGS:
   ;
 
 VOID_PRIMITIVE:
-    VOID 
-  | PRIMITIVE 
+    'def'
+  | /* NULL */
+  | error // {saveError(0); }
   ;
 
+
+
 STATEMENT:
-       
+    ';'  
   | DECLARATION                   
-  | EXPRESSION     
-  | ASSIGN_EXPRESSIONS                  
-  | PRINT OPTIONAL_ARGS_EXPRESSION                 
-  | SCAN OPTIONAL_ARGS_EXPRESSION   
-  | ID '=' EXPRESSION   
+  | EXPRESSION  
+  | ASSIGN_EXPRESSIONS               
+  | PRINT OPTIONAL_ARGS_EXPRESSION            
+  | SCAN OPTIONAL_ARGS_EXPRESSION
+  | ID '=' EXPRESSION
   | WHILE '(' EXPRESSION ')' STATEMENT          
-  | IF '(' EXPRESSION ')' STATEMENT ':'
-  | IF '(' EXPRESSION ')' STATEMENT ':' ELSE STATEMENT  
+  | IF '(' EXPRESSION ')' STATEMENT 
+  | IF '(' EXPRESSION ')' STATEMENT ELSE STATEMENT  
   | '{' STATEMENT_LIST '}' 
   | FOR_STATEMENT 
   | DO_STATEMENT 
@@ -172,27 +169,21 @@ STATEMENT_LIST:
   | /* NULL */
   ;
 
-
-DEF_FUNCTION:
-'def' ID  OPTIONAL_ARGS_EXPRESSION 
-STATEMENT
-RETURN OPTIONAL_ARGS_EXPRESSION
-;
-
-RANGE:
-'range'OPTIONAL_ARGS_EXPRESSION
-;
-
-
-
 FOR_STATEMENT:
   FOR 
-   'for 'ID 'in' RANGE  
-   STATEMENT
+  '(' ID '=' INT_CTES
+  ASSIGN_LOGIC_EXPRESSION
+  ASSIGN_MATH_EXPRESSION ')' 
+  STATEMENT
+  | FOR 
+    '(' PRIMITIVE ID '=' INT_CTES
+    ASSIGN_LOGIC_EXPRESSION
+    ASSIGN_MATH_EXPRESSION ')'
+    STATEMENT
   ;       
 
 DO_STATEMENT: 
-  DO '{' STATEMENT_LIST '}' WHILE '(' EXPRESSION ')'  ;
+  DO '{' STATEMENT_LIST '}' WHILE '(' EXPRESSION ')';
 
 SWITCH_STATEMENT:
   SWITCH '(' EXPRESSION ')' '{' 
@@ -201,8 +192,8 @@ SWITCH_STATEMENT:
   ;
 
 CASES:
-    CASE EXPRESSION ':' STATEMENT_LIST BREAK   
-  | CASE EXPRESSION ':' STATEMENT_LIST BREAK   CASES
+    CASE EXPRESSION ':' STATEMENT_LIST BREAK
+  | CASE EXPRESSION ':' STATEMENT_LIST BREAK CASES
   | CASE EXPRESSION ':' STATEMENT_LIST error CASES
   | error 
   ;
@@ -224,13 +215,13 @@ ASSIGN_EXPRESSIONS:
 
 OPTIONAL_LIST_ASSIGN_EXPRESSION:
     ASSIGN_EXPRESSIONS
-  | ASSIGN_EXPRESSIONS   LIST_ASSIGN_EXPRESSION
+  | ASSIGN_EXPRESSIONS LIST_ASSIGN_EXPRESSION
   | /* NULL */
   ;
 
 LIST_ASSIGN_EXPRESSION:
     ASSIGN_EXPRESSIONS
-  | ASSIGN_EXPRESSIONS   LIST_ASSIGN_EXPRESSION
+  | ASSIGN_EXPRESSIONS LIST_ASSIGN_EXPRESSION
   ; 
 
 MATH_EXPRESSION:
@@ -334,7 +325,7 @@ void yyerror(char *s) {
   saveError(0, s);
 }
 
-int main(int argc, char *argv[]) {
+int main (int argc, char *argv[]) {
 	printf("Lo que has recibido en el argv[1] es: %s\n", argv[1]);
 	FILE *fp = fopen(argv[1], "r");
 	FILE *out_file = fopen("salida.txt", "w"); 
@@ -346,7 +337,7 @@ int main(int argc, char *argv[]) {
 	yyout = out_file;
 
 	yyparse();
-  printTables();
+  printTables(argv);
 	fclose(out_file);
 	fclose(fp);
 

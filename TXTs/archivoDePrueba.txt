@@ -1,0 +1,11 @@
+def eval(xi,exp)
+ans=false
+a,b=3
+for i in range len(exp)):
+part=true
+for j range (len(exp[i])):
+part=part and xi[exp[i][j]]
+and=ans or part
+
+
+return ans

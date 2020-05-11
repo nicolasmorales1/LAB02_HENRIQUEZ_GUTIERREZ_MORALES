@@ -1,0 +1,38 @@
+DEF  ID1 : eval  ABRE:( ID2 : xi  COMA:, ID3 : exp  CIERRA:)
+ ID4 : ans OP-ASIGN:= ID5 : false 
+ ID6 : a  COMA:, ID7 : b OP-ASIGN:=ENTERO:3  
+FOR:  ID8 : i  IN: RANGE:  ID9 : len  ABRE:( ID3 : exp  CIERRA:) CIERRA:) DOSPUNTOS::
+ ID10 : part OP-ASIGN:= ID11 : true 
+FOR:  ID12 : j  RANGE:  ABRE:( ID9 : len  ABRE:( ID3 : exp  COR_ABRE:[ ID8 : i  COR_CIERRA:] CIERRA:) CIERRA:) DOSPUNTOS::
+ ID10 : part OP-ASIGN:= ID10 : part  AND  ID2 : xi  COR_ABRE:[ ID3 : exp  COR_ABRE:[ ID8 : i  COR_CIERRA:] COR_ABRE:[ ID12 : j  COR_CIERRA:] COR_CIERRA:]
+ANDOP-ASIGN:= ID4 : ans  OR  ID10 : part 
+
+
+RETURN  ID4 : ans 
+
+
+TABLA DE INDENTIFICADORES
+Hay 12 identificadores
+ID 1: eval 
+ID 2: xi 
+ID 3: exp 
+ID 4: ans 
+ID 5: false 
+ID 6: a 
+ID 7: b 
+ID 8: i 
+ID 9: len 
+ID 10: part 
+ID 11: true 
+ID 12: j 
+
+
+
+ERRORES LEXICOS
+Hay 0 errores lexicos
+
+
+
+Hay 1 lineas de codigo
+Hay 1 errores
+Error in line 1 Syntax;
